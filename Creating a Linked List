@@ -1,0 +1,228 @@
+#Description: This program takes in values to create a linked list. Once the linked list is created, it can be manipulated using any of the recursive functions defined in the class such as remove, add, contains, reverse, etc.
+
+
+class Node:
+    """
+    Represents a node in a linked list
+    """
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    """
+    A linked list implementation of the List ADT
+    """
+    def __init__(self):
+        self._head = None
+        self._original_list =[]
+
+    def get_head(self):
+        '''returns the frist node in the list'''
+        return self._head
+
+    def add(self, val):
+        '''recursively adds a node to the linked list'''
+        if self._head is None:          #if head is none, add new node as head
+            self._head = Node(val)
+            return
+
+        else:
+            return (self.add_help(val))     #otherwise move to the helper function
+
+
+
+    def add_help(self, val, current = None):
+        '''This function helps the add function by actually adding the new node to the linked list'''
+        if current is None:             #if current (pointer) has not value, initiate it at the head
+            current = self._head
+
+        if current is None:
+            self._head = Node(val)      #if the head is none, create the new node with the value and place it as the head
+
+        if current.next is None:
+            current.next = Node(val)    #if there is no node that comes after the current one, create and place the new node after the current one
+        else:
+            return (self.add_help(val,current.next))  #otherwise if there is a next node, move to that one and run the add_help function again based on the new current
+
+
+
+    def display(self):
+        """
+        Prints out the values in the linked list
+        """
+        current = self._head
+        while current is not None:
+            print(current.data, end=" ")
+            current = current.next
+        print()
+
+
+    def remove(self, val):
+        '''removes a node based on its held data'''
+        if self._head is None:
+            return                  #if the head is none the list is empty, return nothing
+
+        else:
+            return (self.remove_help(val))      #otherwise move onto the remove helper function
+
+    def remove_help(self, val, current = None, previous = None):
+        '''This function helps the remove function by removing the specific node'''
+        if current is None:         #if current is None, initiate current pointer to the head
+            current = self._head
+
+        if current is self._head:       #if current is pointed at the head, initiate previous to the head
+            previous = self._head
+        else:                               #if current is pointed at the node after the head, initiate previous to head
+            if current is self._head.next:
+                previous = self._head
+
+        if current.data != val:             # if the data of the current node does not match our value
+            if current.next is None:
+                return print('value not found')     #check to see if there is a current node, if not, state the value was not found
+            return self.remove_help(val,current.next, previous.next)        #if there is a next node move both pointers to the next node
+        else:
+            current = previous          #if the value was found, remove the node that is holding it.
+            current.next = current.next.next
+
+
+
+
+
+
+    def is_empty(self):
+        """
+        Returns True if the linked list is empty,
+        returns False otherwise
+        """
+        return self._head is None
+
+    def contains(self, val, node = None):
+        '''checks to see if the given value is is in the linked list. If it is, it returns True, if not it returns false'''
+        if node is None:            # If pointer not already initiated, initiate pointer to head
+            node = self._head
+
+        if node is None:  # If the list is empty return false
+            return False
+        if node.data == val:    # if node data is the value, return true
+            return True
+        if node.next is None:   #if the next node is non existant after checking the current node value, the return False
+            return False
+        else:
+            return (self.contains(val, node.next))  #otherwise, run this function again and move the pointer one over.
+
+
+    def to_plain_list(self):
+        '''this function turns the linked list of nodes into a regular list'''
+        self._original_list = []        #initiates the list to empty
+        return (self.to_plain_list_help())  #moves to the plain list helper function
+
+
+    def to_plain_list_help(self, current = None):
+        '''this helper function actually prints the list'''
+        if current is None:         #initiates the current pointer to head
+            current = self._head
+
+        if current is None:         #if the head is none, it prints the list is empty
+            print('list is empty')
+
+        if current is not None:     #if the pointer is not none it adds the current data point to the list
+            self._original_list += [current.data]
+            if current.next is not None:        #if the next node is not empty, it repeats the process
+                return (self.to_plain_list_help(current.next))
+
+            return self._original_list      #if the next node is empty, the it returns the final list
+
+
+
+    def reverse(self, current = None):
+        '''This function reverses the linked list by re arranging the nodes'''
+        if current is None:         #if current is none, initialize pointer to head
+            current = self._head
+
+        if current is None:         #if head is empty, state that the list is empty
+            return print('list is empty')
+
+        else:
+            return (self.reverse_help())    #otherwise jump to the reverse help function
+
+    def reverse_help(self, current=None, previous=None):
+        '''This helper function actually reverses the linked nodes'''
+        if current is None:     #if current pointer is none, initialize it to the head
+            current = self._head
+
+        if current is self._head:   #if the current pointer is at the head, initialize previous pointer to None
+            previous = None
+        else:
+            if previous is None:    #if the previous pointer is none, intialize the pointer to the head
+                previous = self._head
+
+        following = current.next    #point following to what comes after the current node to hold it
+        current.next = previous     # point the current.next pointer to the previous node
+        previous = current          # point the previous node to current
+        current = following         # then move the current pointer to what is being held by the following pointer
+
+        if current is None:         #if the current pointer is None, set the head to the previous node
+            self._head = previous
+            return
+        else:                       #Otherwise repeat the function until the final node is reversed
+
+            return (self.reverse_help(current, previous))
+
+
+    def insert(self, val, pos):
+        """
+        Inserts a node containing val into the linked list at position pos
+        """
+        if self._head is None:  # If the list is empty insert new node as head
+            self.add(val)
+            return
+
+        if pos == 0:        #if the position is zero, it creates a new node and places it as the head
+            temp = self._head
+            self._head = Node(val)
+            self._head.next = temp
+
+        else:
+            return (self.insert_help(val,pos))  #otherwise move onto the insert helper function
+
+
+    def insert_help(self, val, pos, current = None):
+        ''' this function actually inserts the new node where it should be'''
+
+        if current is None:         #if current pointer is none, it initiates it to the head
+            current = self._head
+
+        if pos == 1:                #if the position is 1, it creates the new node and places it, and scoots the others over if necessary
+            temp = current.next
+            current.next = Node(val)
+            current.next.next = temp
+
+
+        if current.next is None:        #if the next node after the current one if none, it adds the new node at the end
+            self.add(val)
+
+
+        else:                   #otherwise, it calls the function again and again subtracting 1 from the position everytime until one of the above tests are completed.
+
+            return (self.insert_help(val, pos - 1, current.next))
+
+
+
+
+'''Test Code'''
+# llist = LinkedList()
+# llist.add(23)
+# llist.add(98)
+# llist.add(415)
+# llist.add(123)
+# llist.add(2)
+# llist.add(10)
+# item = 40
+# print(llist.to_plain_list())
+# print(llist.insert(item,4))
+# print(llist.to_plain_list())
+# print(llist.reverse())
+# print(llist.to_plain_list())
+# print(llist.remove(60))
+# print(llist.to_plain_list())
